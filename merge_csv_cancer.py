@@ -14,13 +14,17 @@ cancer_text_list = [line.strip() for line in lines]
 cancer_text_list.append("cancer")
 
 
-def check_relate(row):
+def check_clinical(row):
     a = False
     text = row["Clinical_Significant"]
     for cancer_text in cancer_text_list:
         if cancer_text.lower() in text.lower():
             a = True
             break
+    return a
+
+
+def check_condiiton(row):
     b = False
     text = row["condition"]
     for text_name in [
@@ -31,6 +35,26 @@ def check_relate(row):
         if text_name == text:
             b = True
             break
+    return b
+
+
+def check_clinical_after(row):
+    if row["Clinical_Significant"] == "NOT report":
+        return True
+    else:
+        return check_clinical(row)
+
+
+def check_condition_after(row):
+    if row["condition"] == "NOT report":
+        return True
+    else:
+        return check_condiiton(row)
+
+
+def check_relate(row):
+    a = check_clinical(row)
+    b = check_condiiton(row)
     return a and b
 
 
@@ -79,8 +103,74 @@ def not_relate(series):
     return "not relate"
 
 
+def create_group(tmp_file, mask_func, func, list_exist: list = None):
+    try:
+        print(list_exist)
+        if len(tmp_file) == 0:
+            return pd.DataFrame({})
+        new_tmp_file = tmp_file.copy()
+        mask_not_relate = new_tmp_file.apply(mask_func, axis=1)
+
+        def check_if_exist(row):
+            if (
+                row["Gene"],
+                row["rsId"],
+                row["Ref"],
+                row["Alt"],
+            ) in list_exist:
+                print("exist", row["Gene"], row["rsId"])
+                return True
+            else:
+                return False
+
+        condition_exist = ~new_tmp_file.apply(check_if_exist, axis=1)
+        if list_exist is not None:
+            print("exist condition")
+            condition_exist = new_tmp_file.apply(check_if_exist, axis=1)
+            tmp_file_77 = new_tmp_file[~mask_not_relate & ~condition_exist]
+        else:
+            tmp_file_77 = new_tmp_file[~mask_not_relate]
+        group_by_tmp = tmp_file_77.groupby(
+            [
+                "Gene",
+                "rsId",
+                "Ref",
+                "Alt",
+            ]
+        ).agg(
+            {
+                # "Gene": first_strings,
+                # "rsId": first_strings,
+                # "Ref": first_strings,
+                "Variant type": func,
+                "Functional Consequence": func,
+                "condition": func,
+                "Clinical_Significant": func,
+                "reference": func,
+            }
+        )
+        g2 = []
+        r2 = []
+        re2 = []
+        a2 = []
+        for ind in group_by_tmp.index:
+            g2.append(ind[0])
+            r2.append(ind[1])
+            re2.append(ind[2])
+            a2.append(ind[3])
+        group_by_tmp["Gene"] = g2
+        group_by_tmp["rsId"] = r2
+        group_by_tmp["Ref"] = re2
+        group_by_tmp["Alt"] = a2
+        return group_by_tmp
+    except Exception as error:
+        print(f"error der {error}")
+        return pd.DataFrame({})
+
+
 for file_name in list_files:
     tmp_file = pd.read_csv(input_folder + file_name)
+    # tmp_file = tmp_file.drop(columns=["related_2_cancer"])
     mask = tmp_file.apply(check_relate, axis=1)
     # mask2 = tmp_file.apply(check_pathogenic, axis=1)
     conbin_mask = mask
@@ -132,42 +222,31 @@ for file_name in list_files:
         else:
             return False
 
-    mask_3 = tmp_file.apply(check_if_exist, axis=1)
-    tmp_file_99 = tmp_file[~mask_3]
-    group_by_tmp_2 = tmp_file_99.groupby(
-        [
-            "Gene",
-            "rsId",
-            "Ref",
-            "Alt",
-        ]
-    ).agg(
-        {
-            # "Gene": first_strings,
-            # "rsId": first_strings,
-            # "Ref": first_strings,
-            "Variant type": not_relate,
-            "Functional Consequence": not_relate,
-            "condition": not_relate,
-            "Clinical_Significant": not_relate,
-            "reference": not_relate,
-        }
-    )
-    g2 = []
-    r2 = []
-    re2 = []
-    a2 = []
-    for ind in group_by_tmp_2.index:
-        g2.append(ind[0])
-        r2.append(ind[1])
-        re2.append(ind[2])
-        a2.append(ind[3])
-    group_by_tmp_2["Gene"] = g2
-    group_by_tmp_2["rsId"] = r2
-    group_by_tmp_2["Ref"] = re2
-    group_by_tmp_2["Alt"] = a2
+    def not_phatogenic(series):
+        return "Not Pathogenic"
+
+    def not_related_text(series):
+        return "Not relate"
+
     all_df = pd.concat([all_df, group_by_tmp], ignore_index=False)
-    # all_df = pd.concat([all_df, group_by_tmp_2], ignore_index=False)
+    after_clinical_not_relate = create_group(
+        tmp_file,
+        check_clinical_after,
+        not_related_text,
+        list_exist=all_df.index.to_list(),
+    )
+    print(len(all_df.index.to_list()), len(after_clinical_not_relate))
+    all_df = pd.concat([all_df, after_clinical_not_relate], ignore_index=False)
+    new_index = all_df.index.to_list()
+    after_condition_not_phatogenic = create_group(
+        tmp_file,
+        check_condition_after,
+        not_phatogenic,
+        list_exist=new_index,
+    )
+    print(new_index)
+    print(len(new_index))
+    all_df = pd.concat([all_df, after_condition_not_phatogenic], ignore_index=True)
     left_df = pd.concat([left_df, tmp_file_3], ignore_index=True)
 
 
