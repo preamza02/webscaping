@@ -121,13 +121,19 @@ for file_name in list_files:
     group_by_tmp["Alt"] = a
 
     def check_if_exist(row):
-        if (row["Gene"], row["rsId"], row["Ref"], row["Alt"]) in group_by_tmp.index:
+        if (
+            row["Gene"],
+            row["rsId"],
+            row["Ref"],
+            row["Alt"],
+        ) in group_by_tmp.index.to_list():
+            # print(group_by_tmp.index.to_list())
             return True
         else:
             return False
 
     mask_3 = tmp_file.apply(check_if_exist, axis=1)
-    tmp_file_99 = tmp_file[mask_3]
+    tmp_file_99 = tmp_file[~mask_3]
     group_by_tmp_2 = tmp_file_99.groupby(
         [
             "Gene",
@@ -161,12 +167,15 @@ for file_name in list_files:
     group_by_tmp_2["Ref"] = re2
     group_by_tmp_2["Alt"] = a2
     all_df = pd.concat([all_df, group_by_tmp], ignore_index=False)
-    all_df = pd.concat([all_df, group_by_tmp_2], ignore_index=False)
+    # all_df = pd.concat([all_df, group_by_tmp_2], ignore_index=False)
     left_df = pd.concat([left_df, tmp_file_3], ignore_index=True)
 
 
 full_output_file_name = output_folder + output_file_name
 full_output_file_name_not = output_folder + output_file_name_not
 print(f"start save {full_output_file_name}")
-all_df.to_csv(full_output_file_name, index=False)
+
+all_df.sort_values(by=["Gene", "rsId"], ascending=[True, True]).to_csv(
+    full_output_file_name, index=False
+)
 left_df.to_csv(full_output_file_name_not, index=False)
