@@ -63,31 +63,9 @@ print(f"found file {list_files}")
 print("start loading all file")
 all_df = pd.DataFrame(
     {},
-    columns=[
-        "Gene",
-        "rsId",
-        "Ref",
-        "Alt",
-        "Variant type",
-        "Functional Consequence",
-        "condition",
-        "Clinical_Significant",
-        "reference",
-    ],
 )
 left_df = pd.DataFrame(
     {},
-    columns=[
-        "Gene",
-        "rsId",
-        "Ref",
-        "Alt",
-        "Variant type",
-        "Functional Consequence",
-        "condition",
-        "Clinical_Significant",
-        "reference",
-    ],
 )
 
 
