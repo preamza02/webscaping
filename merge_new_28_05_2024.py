@@ -3,8 +3,8 @@ import pandas as pd
 
 input_folder = "./input/"
 output_folder = "./output/"
-output_file_name = "merge_output_new_cancer_only.csv"
-output_file_name_not = "merge_output_new_not_cancer_only.csv"
+output_file_name = "merge_output_new.csv"
+output_file_name_not = "merge_output_new_not.csv"
 print("start add related to cancer")
 list_col = [
     "Gene",
