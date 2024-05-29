@@ -90,7 +90,7 @@ def get_data(response):
 # all_gene_txt = "ABRAXAS1, AIP, ALK, ANKRD26, APC, ARMC5, ATM, ATR, AXIN2, BAP1, BARD1, BLM, BMPR1A, BRAF, BRCA1, BRCA2, BRIP1, BUB1B, CASR, CBL, CD70, CDC73, CDH1, CDK4, CDKN1B, CDKN1C, CDKN2A, CEBPA, CEP57, CHEK1, CHEK2, CTC1, CTNNA1, CYLD, DDB2, DDX41, DICER1, DIS3L2, DKC1, DLST, DROSHA, EFL1, EGFR, EGLN1, ELANE, EPCAM, ERCC1, ERCC2, ERCC3, ERCC4, ERCC5, ETV6, EXO1, EXT1, EXT2, EZH2, FAM111B, FAN1, FANCA, FANCB, FANCC, FANCD2, FANCE, FANCF, FANCG, FANCI, FANCL, FANCM, FH, FLCN, FOCAD, GALNT12, GATA2, GPC3, GPR101, GREM1, HAVCR2, HNF1A, HNF1B, HOXB13, HRAS, IKZF1, KIF1B, KIT, KITLG, KRAS, LZTR1, MAP2K1, MAP2K2, MAX, MC1R, MEN1, MET, MITF, MLH1, MLH3, MRE11, MRE11A, MSH2, MSH3, MSH6, MUTYH, NBN, NF1, NF2, NHP2, NOP10, NRAS, NSD1, NSUN2, NTHL1, PALB2, PALLD, PAX5, PDGFRA, PHOX2B, PIK3CA, PMS1, PMS2, POLD1, POLE, POLH, POT1, PPM1D, PRF1, PRKAR1A, PRSS1, PTCH1, PTCH2, PTEN, PTPN11, RAB43, RABL3, RAD1, RAD50, RAD51C, RAD51D, RAF1, RASA2, RB1, RECQL, RECQL4, RECQL5, REST, RET, RHBDF2, RIT1, RNF43, RPS20, RRAS, RUNX1, SAMD9, SAMD9L, SBDS, SDHA, SDHAF2, SDHB, SDHC, SDHD, SHOC2, SLX4, SMAD4, SMARCA4, SMARCB1, SMARCE1, SOS1, SOS2, SPRED1, SRP72, STK11, SUFU, TERC, TERT, TGFBR2, TINF2, TMEM127, TP53, TP53I3, TRIP13, TSC1, TSC2, TYR, VHL, WRAP53, WRN, WT1, XPA, XPC, XRCC2, XRCC3"
 # all_gene_txt = "ABRAXAS1, AIP, ALK, ANKRD26, APC, ARMC5, ATM, ATR, AXIN2, BAP1, BARD1, BLM, BMPR1A, BRAF, BRCA1, BRCA2, BRIP1, BUB1B, CASR, CBL, CD70, CDC73, CDH1, CDK4, CDKN1B, CDKN1C, CDKN2A, CEBPA, CEP57, CHEK1, CHEK2, CTC1, CTNNA1, CYLD, DDB2, DDX41, DICER1, DIS3L2, DKC1, DLST, DROSHA, EFL1, EGFR, EGLN1, ELANE, EPCAM, ERCC1, ERCC2, ERCC3, ERCC4, ERCC5, ETV6, EXO1, EXT1, EXT2, EZH2, FAM111B, FAN1, FANCA, FANCB, FANCC, FANCD2, FANCE, FANCF, FANCG, FANCI, FANCL, FANCM, FH, FLCN, FOCAD, GALNT12, GATA2, GPC3, GPR101, GREM1, HAVCR2, HNF1A, HNF1B, HOXB13, HRAS, IKZF1, KIF1B, KIT, KITLG, KRAS, LZTR1"
 # all_gene_list = [x.strip() for x in all_gene_txt.split(",")]
-all_gene_list = ["ABRAXAS1"]
+all_gene_list = ["ABRAXAS1", "AIP", "ALK", "ANKRD26", "APC", "ARMC5", "ATM"]
 for round in range(((len(all_gene_list) - 1) // 10) + 1):
     output_file_name = f"output_{round*10+1}_{(round+1)*10}.csv"
     new_df = pd.DataFrame(
@@ -99,9 +99,9 @@ for round in range(((len(all_gene_list) - 1) // 10) + 1):
             "rsId",
             "Ref",
             "Alt",
-            "Functional Consequence",
-            "Alleles Frequency",
             "Effect",
+            "Alleles Frequency",
+            "Number of citation",
             "Publications",
             "Clinical Significant",
             "ClinVar Accession",
@@ -204,9 +204,9 @@ for round in range(((len(all_gene_list) - 1) // 10) + 1):
                     By.XPATH,
                     f'//*[@id="snp_pub_count"]',
                 )
-                pup_count = element_xpath_pup_count.text
+                pup_count = element_xpath_pup_count.text.split()[0]
             except:
-                pup_count = "0 publications"
+                pup_count = "non citation"
             frequency_text = []
             for elment_t in [
                 '//*[@id="main_content"]/main/div/div[3]/dl[1]/dd[5]/div[1]',
@@ -228,12 +228,14 @@ for round in range(((len(all_gene_list) - 1) // 10) + 1):
             element_xpath.click()
             try:
                 publication_link = driver.find_element(
-                    By.XPATH, '//*[@id="publications"]/a[2]'
+                    By.XPATH, '//*[@id="publications"]/a[2]/button'
                 )
-                next_link = (
-                    "https://www.ncbi.nlm.nih.gov"
-                    + publication_link.get_attribute("href")
-                )
+                publication_link.click()
+                # next_link = (
+                #     "https://www.ncbi.nlm.nih.gov"
+                #     + publication_link.get_attribute("href")
+                # )
+                next_link = driver.current_url
             except:
                 next_link = ""
             element_xpath = driver.find_element(By.XPATH, f'//*[@id="label_id_second"]')
@@ -265,9 +267,9 @@ for round in range(((len(all_gene_list) - 1) // 10) + 1):
                     "rsId": rs_id,
                     "Ref": ref,
                     "Alt": alt,
-                    "Functional Consequence": functional_consequence,
+                    "Effect": functional_consequence,
                     "Alleles Frequency": real_freq_text,
-                    "Effect": pup_count,
+                    "Number of citation": pup_count,
                     "Publications": next_link,
                     "Clinical Significant": data["Clinical Significance"],
                     "ClinVar Accession": data["ClinVar Accession"],
