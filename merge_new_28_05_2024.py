@@ -19,7 +19,7 @@ list_col = [
     "ClinVar Accession",
     "Cytogenetic location",
     "Variant name",
-    "Diease name",
+    "Disease name",
     "Synonyms",
 ]
 
@@ -32,11 +32,12 @@ cancer_text_list.append("cancer")
 
 def check_clinical(row):
     a = False
-    text = row["Diease name"]
+    text = str(row["Disease name"])
     for cancer_text in cancer_text_list:
         if cancer_text.lower() in text.lower():
             a = True
             break
+
     return a
 
 
@@ -55,7 +56,7 @@ def check_condiiton(row):
 
 
 def check_clinical_after(row):
-    if row["Diease name"] == "NOT report":
+    if row["Disease name"] == "NOT report":
         return True
     else:
         return check_clinical(row)
@@ -144,7 +145,7 @@ def create_group(tmp_file, mask_func, func, list_exist: list = None):
             "ClinVar Accession": func,
             "Cytogenetic location": func,
             "Variant name": func,
-            "Diease name": func,
+            "Disease name": func,
             "Synonyms": func,
         }
     )
@@ -220,6 +221,18 @@ for file_name in list_files:
     # all_df = pd.concat([all_df, after_condition_not_phatogenic], ignore_index=True)
     # left_df = pd.concat([left_df, tmp_file_3], ignore_index=True)
 
+
+# merge col and del col from p pan
+all_df["Disease name (ClinVar Accession)"] = (
+    ""
+    + all_df["Disease name"].astype(str)
+    + " ("
+    + all_df["ClinVar Accession"].astype(str)
+    + ")"
+)
+all_df = all_df.drop(
+    columns=["ClinVar Accession", "Disease name", "Clinical Significant", "Synonyms"]
+)
 
 full_output_file_name = output_folder + output_file_name
 full_output_file_name_not = output_folder + output_file_name_not
