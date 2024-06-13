@@ -1,0 +1,48 @@
+Leukemia
+Liver Cancer
+Lung Cancer
+Lymphoma
+Hodgkin
+Mastocytosis
+Medulloblastoma
+Melanoma
+Meningioma
+Mesothelioma
+Multiple Myeloma
+Myelodysplastic Syndromes
+Nasal Cavity and Paranasal Sinus Cancer
+Nasopharyngeal Cancer
+Neuroblastoma
+Neuroendocrine tumor
+Oral and Oropharyngeal Cancer
+Osteosarcoma
+Ovarian cancer
+Fallopian Tube cancer
+Peritoneal Cancer
+Pancreatic Cancer
+Parathyroid Cancer
+Penile Cancer
+Pheochromocytoma
+Paraganglioma
+Pituitary Gland Tumor
+Pleuropulmonary Blastoma
+Prostate Cancer
+Retinoblastoma
+Rhabdomyosarcoma
+Salivary Gland Cancer
+Sarcoma
+Kaposi
+Sarcomas
+Skin Cancer
+Small Bowel Cancer
+Stomach Cancer
+Testicular Cancer
+Thymoma Carcinoma
+Thymic Carcinoma
+Thyroid Cancer
+Uterine Cancer
+Vaginal Cancer
+Vulvar Cancer
+Waldenstrom Macroglobulinemia
+Lymphoplasmacytic Lymphoma
+Wilms Tumor

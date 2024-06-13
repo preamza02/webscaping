@@ -1,0 +1,5 @@
+param	value
+cmd_line	cuffdiff -p 8 -o /share/data/home/kullapat.k/Rice_RNAseq/diff24 -b /share/data/home/kullapat.k/Rice_RNAseq/rice_genome.fasta -u /share/data/home/kullapat.k/Rice_RNAseq/T24diff/m24/merged.gtf /share/data/home/kullapat.k/Rice_RNAseq/diffT2.txt /share/data/home/kullapat.k/Rice_RNAseq/diffT4.txt 
+version	2.2.1
+SVN_revision	4237
+boost_version	104700

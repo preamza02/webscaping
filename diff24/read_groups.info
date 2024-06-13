@@ -1,0 +1,3 @@
+file	condition	replicate_num	total_mass	norm_mass	internal_scale	external_scale
+/share/data/home/kullapat.k/Rice_RNAseq/diffT2.txt	q1	0	0	0	1	1
+/share/data/home/kullapat.k/Rice_RNAseq/diffT4.txt	q2	0	0	0	1	1
